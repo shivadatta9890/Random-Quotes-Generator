@@ -1,36 +1,50 @@
-let quoteText = document.querySelector(".quote");
+let quote = document.querySelector(".quote");
+
 let authorName = document.querySelector(".name");
-let soundBtn = document.querySelector('.sound');
-let copyBtn = document.querySelector('.copy');
-let twitterBtn = document.querySelector('.twitter');
-let newquoteBtn = document.querySelector(".btn");
 
+let speakBtn = document.querySelector(".sound");
+let copyBtn = document.querySelector(".copy");
 
-const getRandomQuote = async()=>{
-    let randomIndex = Math.floor(Math.random()*51);
-    // console.log(randomIndex);
-    newquoteBtn.classList.add("loading");
-    newquoteBtn.innerText = "Loading...";
-    const res = await fetch("https://zenquotes.io/api/quotes/");
-    const data = await res.json();
-    quoteText.innerText = data[randomIndex].q;
-    authorName.innerText = data[randomIndex].a;
-    // console.log(data);
-    // console.log(data[randomIndex]);
-    newquoteBtn.innerText = "New Quote";
-    newquoteBtn.classList.remove("loading");
-}
-newquoteBtn.addEventListener('click',getRandomQuote);
+const newQuoteBtn = document.querySelector(".btn");
 
-soundBtn.addEventListener('click',()=>{
-    let text = `${quoteText.innerText} by ${authorName.innerText}`;
-    let utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(utterance);
+const generateNewQuote = async () => {
+  newQuoteBtn.innerText = "Loading Quote...";
+  newQuoteBtn.classList.add("loading");
+  const res = await fetch("https://zenquotes.io/api/quotes/");
+  const randomNumber = Math.floor(Math.random() * 50);
+  const data = await res.json();
+  // console.log("data",data);
+  quote.innerText = data[randomNumber].q;
+  authorName.innerText = data[randomNumber].a;
+  newQuoteBtn.innerText = "New Quote";
+  newQuoteBtn.classList.remove("loading");
+};
 
-})
+const speakQuote = async () => {
+  let utterance = new SpeechSynthesisUtterance(
+    `${quote.innerText} by ${authorName.innerText}`
+  );
+  speechSynthesis.speak(utterance);
+};
 
-copyBtn.addEventListener('click',()=>{
-    let text = quoteText.innerText;
-    navigator.clipboard.writeText(text);
-    // console.log(text);
+const copyQuote = async()=>{
+  copyBtn.innerHTML ='<i class="fas fa-check"></i>';
+  navigator.clipboard.writeText(quote.innerText);
+  setTimeout(()=>{
+    copyBtn.innerHTML ='<i class="fas fa-copy"></i>';
+  },3000);
+};
+
+newQuoteBtn.addEventListener("click", () => {
+  generateNewQuote();
+});
+
+speakBtn.addEventListener("click", () => {
+  setTimeout(() => {
+    speakQuote();
+  }, 1000);
+});
+
+copyBtn.addEventListener("click",()=>{
+  copyQuote();
 });
